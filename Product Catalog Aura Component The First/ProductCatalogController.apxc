@@ -1,0 +1,317 @@
+public class ProductCatalogController {
+    
+    
+    @AuraEnabled
+    public static List<Product3__c> getInitProductList(){
+        
+        List<Id> productIds =  (List<Id>) Cache.Session.get('local.Inspira.productIds');
+        
+        if(productIds == null || productIds.size() == 0){
+            productIds = new List<Id>();
+        	Cache.Session.put('local.Inspira.productIds', productIds);
+        }
+        
+        
+        List<Product3__c> initProductList = [SELECT 
+                                              Name, 
+                                              Manufacturer_Name__c, 
+                                              Quantity__c, 
+                                              Unit_Of_Measure__c,
+                                              Price__c,
+                                              Type__c, 
+                                              Variety__c, 
+                                              Quality__c, 
+                                              Characteristics__c, 
+                                              State__c, 
+                                              Province__c, 
+                                              Possible_date__c 
+                                          FROM Product3__c
+                                          WHERE Possible_date__c <= TODAY];
+        
+        return initProductList;
+    }
+    
+    @AuraEnabled
+    public static List<Product3__c> getFilteredProductList(String myType, String variety, Integer qualityFrom, Integer qualityTo, Integer quantity, String state, String province){
+        
+        String filteredQuery = 'SELECT Name, Manufacturer_Name__c, Quantity__c, Unit_Of_Measure__c, Price__c, Type__c, Variety__c, Quality__c, Characteristics__c, State__c, Province__c, Possible_date__c FROM Product3__c WHERE IsDeleted = false ';
+        
+        if( myType!='all' && myType!=null && myType.length()>0 ){
+            //filteredQuery += ' AND Type__c = ' + '\'' + myType + '\' '  ;
+            filteredQuery += ' AND Type__c =  :myType ';
+        }
+        
+        if( variety!='all' && variety!=null && variety.length()>0 ){
+            filteredQuery += ' AND Variety__c = :variety ';
+        }
+        
+        if(qualityFrom != 0 && qualityTo != 0){
+            filteredQuery += ' AND Quality__c >= :qualityFrom AND Quality__c <= :qualityTo ';
+            
+    	}else if(qualityFrom != 0){
+            filteredQuery += ' AND Quality__c >= :qualityFrom ';
+            
+        }else if(qualityTo != 0){
+            filteredQuery += ' AND Quality__c <= :qualityTo ';
+        }
+        
+        if(quantity != 0){
+            filteredQuery += ' AND Quantity__c = :quantity ';
+        }
+        
+        if( state!='' && state!='--- None ---' && state!=null && state.length()>0 ){
+            filteredQuery += ' AND State__c = ' + '\'' + state + '\' ';
+        }
+        
+        if( province!='' && province!='--- None ---' && province!=null && province.length()>0 ){
+            filteredQuery += ' AND Province__c =' + '\'' + province + '\' ';
+        }
+        
+        List<Product3__c> filteredList = Database.query(filteredQuery);
+        System.debug('=======================');
+        System.debug('Records returned --------');
+        System.debug(filteredList);
+        System.debug('Filter query: ' + filteredQuery + '.');
+        return filteredList;
+    }
+    
+    
+    @AuraEnabled
+    public static List<Product3__c> addProductToCart(Id productId){
+       
+    	List<Id> productIds  = (List<Id>) Cache.Session.get('local.Inspira.productIds');
+        Boolean allOk = true;
+        
+        For(Id curId : productIds){
+            if(curId == productId){
+                allOk = false;
+            }
+        }
+        
+        List<Product3__c> productsAdded;
+        if(allOk){
+            productIds.add(productId);
+            Cache.Session.put('local.Inspira.productIds', productIds);
+    
+            productsAdded = [SELECT 
+                             Name, 
+                             Manufacturer_Name__c, 
+                             Quantity__c, 
+                             Unit_Of_Measure__c, 
+                             Type__c, 
+                             Price__c,
+                             Variety__c, 
+                             Quality__c, 
+                             Characteristics__c, 
+                             State__c, 
+                             Province__c, 
+                             Possible_date__c 
+                             FROM Product3__c
+                             WHERE Id in :productIds];
+        
+        }else{
+            productsAdded = new List<Product3__c>(); //return an empty list
+        }    
+        //return all the information of the products added to cart. If empty means the product already existed 
+        
+        return productsAdded;
+        
+   	}
+    
+    @AuraEnabled
+    public static List<Product3__c> removeProductFromCart(Id productId){
+       
+    	List<Id> productIds  = (List<Id>) Cache.Session.get('local.Inspira.productIds');
+        
+        for (Integer i = (productIds.size()-1) ; i>= 0 ; i--){
+            Id curId = productIds[i];
+            if(curId == productId){
+                productIds.remove(i);
+            }
+        } 
+        
+        Cache.Session.put('local.Inspira.productIds', productIds);
+
+    	
+        List<Product3__c> productsAdded = [SELECT 
+                                              Name, 
+                                              Manufacturer_Name__c, 
+                                              Quantity__c, 
+                                              Unit_Of_Measure__c, 
+                                              Type__c, 
+                                           	  Price__c,
+                                              Variety__c, 
+                                              Quality__c, 
+                                              Characteristics__c, 
+                                              State__c, 
+                                              Province__c, 
+                                              Possible_date__c 
+                                          FROM Product3__c
+                                          WHERE Id in :productIds];
+        
+        //return all, the information of the products added to cart 
+        return productsAdded;
+        
+   	}
+    
+    @AuraEnabled
+    public static List<Product3__c> querySingleProduct(Id productId){
+       
+        List<Product3__c> products= [SELECT 
+                                              Name, 
+                                              Manufacturer_Name__c, 
+                                              Quantity__c, 
+                                              Unit_Of_Measure__c, 
+                                              Type__c, 
+                                           	  Price__c,
+                                              Variety__c, 
+                                              Quality__c, 
+                                              Characteristics__c, 
+                                              State__c, 
+                                              Province__c, 
+                                              Possible_date__c 
+                                          FROM Product3__c
+                                          WHERE Id = :productId];
+        
+        //return all, the information of the products added to cart 
+        return products;
+        
+   	}
+    
+    
+    @AuraEnabled
+    public static List<Product3__c> executeSOSLProductQuery(String keywords){
+        
+        List<List<Product3__c>> results = [FIND :keywords IN ALL FIELDS 
+                                              RETURNING Product3__c(Name, 
+                                                                    Manufacturer_Name__c, 
+                                                                    Quantity__c, 
+                                                                    Unit_Of_Measure__c, 
+                                                                    Type__c, 
+                                                                    Price__c,
+                                                                    Variety__c, 
+                                                                    Quality__c, 
+                                                                    Characteristics__c, 
+                                                                    State__c, 
+                                                                    Province__c, 
+                                                                    Possible_date__c)];
+        
+        
+        List<Product3__c> products = results[0];
+        
+        return products;
+    }
+    
+    
+    @AuraEnabled
+    public static Decimal getTotalPriceCart(){
+        
+        List<Id> productIds  = (List<Id>) Cache.Session.get('local.Inspira.productIds');
+        AggregateResult[] value = [SELECT 
+                            SUM(Price__c)price
+                            FROM Product3__c
+                            WHERE Id IN :productIds];
+        
+        Decimal subtotal = (Decimal) value[0].get('price');
+        return subtotal;
+    } 
+    
+    
+    
+    
+    
+    
+    
+    //--------------- methods and functionality of dependent picklists----------------------
+    @AuraEnabled 
+    public static Map<String, List<String>> getDependentMap(sObject objDetail, string contrfieldApiName,string depfieldApiName) {
+        String controllingField = contrfieldApiName.toLowerCase();
+        String dependentField = depfieldApiName.toLowerCase();
+        
+        Map<String,List<String>> objResults = new Map<String,List<String>>();
+        
+        Schema.sObjectType objType = objDetail.getSObjectType();
+        if (objType==null){
+            return objResults;
+        }
+        
+        Map<String, Schema.SObjectField> objFieldMap = objType.getDescribe().fields.getMap();
+        
+        if (!objFieldMap.containsKey(controllingField) || !objFieldMap.containsKey(dependentField)){
+            return objResults;     
+        }
+        
+        Schema.SObjectField theField = objFieldMap.get(dependentField);
+        Schema.SObjectField ctrlField = objFieldMap.get(controllingField);
+        
+        List<Schema.PicklistEntry> contrEntries = ctrlField.getDescribe().getPicklistValues();
+        List<PicklistEntryWrapper> depEntries = wrapPicklistEntries(theField.getDescribe().getPicklistValues());
+        List<String> controllingValues = new List<String>();
+        
+        for (Schema.PicklistEntry ple : contrEntries) {
+            String label = ple.getLabel();
+            objResults.put(label, new List<String>());
+            controllingValues.add(label);
+        }
+        
+        for (PicklistEntryWrapper plew : depEntries) {
+            String label = plew.label;
+            String validForBits = base64ToBits(plew.validFor);
+            for (Integer i = 0; i < validForBits.length(); i++) {
+                String bit = validForBits.mid(i, 1);
+                if (bit == '1') {
+                    objResults.get(controllingValues.get(i)).add(label);
+                }
+            }
+        }
+        return objResults;
+    }
+    
+    public static String decimalToBinary(Integer val) {
+        String bits = '';
+        while (val > 0) {
+            Integer remainder = Math.mod(val, 2);
+            val = Integer.valueOf(Math.floor(val / 2));
+            bits = String.valueOf(remainder) + bits;
+        }
+        return bits;
+    }
+    
+    public static String base64ToBits(String validFor) {
+        if (String.isEmpty(validFor)) return '';
+        
+        String validForBits = '';
+        
+        for (Integer i = 0; i < validFor.length(); i++) {
+            String thisChar = validFor.mid(i, 1);
+            Integer val = base64Chars.indexOf(thisChar);
+            String bits = decimalToBinary(val).leftPad(6, '0');
+            validForBits += bits;
+        }
+        
+        return validForBits;
+    }
+    
+    private static final String base64Chars = '' +
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+        'abcdefghijklmnopqrstuvwxyz' +
+        '0123456789+/';
+    
+    
+    private static List<PicklistEntryWrapper> wrapPicklistEntries(List<Schema.PicklistEntry> PLEs) {
+        return (List<PicklistEntryWrapper>)
+            JSON.deserialize(JSON.serialize(PLEs), List<PicklistEntryWrapper>.class);
+    }
+    
+    public class PicklistEntryWrapper{
+        public String active {get;set;}
+        public String defaultValue {get;set;}
+        public String label {get;set;}
+        public String value {get;set;}
+        public String validFor {get;set;}
+        public PicklistEntryWrapper(){            
+        }
+        
+    }
+    
+}

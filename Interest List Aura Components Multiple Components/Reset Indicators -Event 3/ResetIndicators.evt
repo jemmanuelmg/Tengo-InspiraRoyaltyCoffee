@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="Reset some indicators in the Interest List component" >
+    <aura:attribute name="noItemsToDisplayAtt" Type="Boolean"/>
+    <aura:attribute name="actualCartValueAtt" Type="Decimal"/>
+    <aura:attribute name="countOfProductsAtt" Type="Decimal"/>
+</aura:event>

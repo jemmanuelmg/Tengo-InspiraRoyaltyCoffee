@@ -1,0 +1,432 @@
+<aura:component controller="ProductCatalogController" implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <!--meta tags-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <!--Styles-->
+	<ltng:require styles="/resource/FontAwesome/fontawesome-free-5.11.2-web/css/all.css" />
+    <ltng:require styles="/resource/SlickLibrarySrc/SlickLibrary/SlickLibrary/slick.css"/>
+    <ltng:require styles="/resource/SlickLibrarySrc/SlickLibrary/SlickLibrary/slick-theme.css"/>
+    <ltng:require styles="/resource/SlickLibrarySrc/SlickLibrary/SlickLibrary/slick-style.css"/>
+    
+    <!-- Aura handlers-->   
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <!-- Aura attributes-->  
+	<aura:attribute name="productList" type="List" />
+    <aura:attribute name="productPicked" type="List" />
+    <aura:attribute name="noItemsToDisplay" type="Boolean" default="false"/>
+    <aura:attribute name="isLoading" type="boolean" default="false"/>
+    <aura:attribute name="showAlertSuc" type="boolean" default="false"/>
+    <aura:attribute name="showAlertWar" type="boolean" default="false"/>
+    <aura:attribute name="alertMessage" type="String" default=""/>
+    
+    <aura:attribute name="addedToCart" type="List" />
+    <aura:attribute name="actualCartValue" type="Decimal" default="0"/> 
+    <aura:attribute name="openModalBox" type="boolean" default="false"/>
+    
+    <aura:attribute name="listControllingValues" type="list" default="[]" description="to store controller field values"/>
+    <aura:attribute name="listDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="depnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="bDisabledDependentFld" type="boolean" default="true"/> 
+    <aura:attribute name="objDetail" type="Product3__c" default="{'sobjectType' : 'Product3__c'}"/>
+    <aura:attribute name="controllingFieldAPI" type="string" default="State__c" description="store field API name of Controller field"/>
+    <aura:attribute name="dependingFieldAPI" type="string" default="Province__c" description="store field API name of dependent field"/>
+    
+    <aura:attribute name="backgroundImageURL" type="String" default=""/>
+    <aura:attribute name="backgroundColor" type="String" default="white"/>
+    
+    
+    
+    
+
+    
+    <div class="slds-grid slds-gutters">
+      <div class="slds-col slds-size_1-of-1">
+        <center>
+        	
+            <div class="jumbotron" style="{!'position: relative; height: 33vh; background:' + v.backgroundColor  + ' url(' + v.backgroundImageURL +') no-repeat;background-position: center;background-size: cover;'}"> 
+                <div class="jumbotron-text-container">
+                    <div class="slds-text-heading_large jumbotron-title">Coffee product catalog.</div>
+                    <br/>
+                    <div class="slds-text-align_center jumbotron-subtitle">Find coffee with the best quality at the best price!</div>
+                    <br/>
+                </div>
+            </div>
+            
+        </center>
+      </div>
+    </div>
+    
+    <!--whole grid container-->	
+    <div class="slds-grid slds-gutters">
+          <!--first column for controls-->	
+          <div class="slds-col slds-size_3-of-12 controls-column">
+              
+              <div class="slds-text-heading_medium slds-text-align_center slds-box"><b>Filter of product &nbsp;&nbsp; <i class="fas fa-filter black"></i></b></div>
+              <br/>
+              
+              <div class="slds-box sticky">
+                  	<br/>
+              		<!--Type of coffee selector-->
+                    <h2 class="header">Filter by type of product</h2>
+                    <lightning:select aura:id="type" label="Type of coffee">
+                        <option value="all">All</option>
+                        <option value="Green Coffee">Green coffee</option>
+                        <option value="Roasted Coffee">Roasted coffee</option>
+                    </lightning:select>
+                    
+                    <br/>   
+                    
+                    <!--Variety of coffee selector-->
+                    <h2 class="header">Filter by variety of product</h2>
+                    <lightning:select aura:id="variety" label="Variety of coffee">
+                        <option value="all">All</option>
+                        <option value="Castillo">Castillo</option>
+                        <option value="Caturro">Caturro</option>
+                        <option value="Pajarito">Pajarito</option>
+                        <option value="Geisha">Geisha</option>
+                        <option value="Bourbon">Bourbon</option>
+                    </lightning:select>
+                  	<br/>  
+                  	<div class="slds-border_bottom"></div>
+                    
+                    <br/>
+                    
+                  	<!--Quality-->
+                  	<h2 class="header">Quality: select a quality value</h2>
+                  	<ui:inputCheckbox aura:id="checkboxQuality" label="Show me all qualities   " value="true" change="{!c.changeQualityControls}"/>
+                  
+                  	<lightning:slider label="From" aura:id="qualityFrom" min="80" max="150" disabled="true"/>
+                  
+                  	<lightning:slider label="To" aura:id="qualityTo" min="80" max="150" disabled="true"/>
+					
+					<br/>  
+                  	<div class="slds-border_bottom"></div>
+                  	<!--<lightning:select aura:id="quality" label="Score of coffee">
+                        <option value="all">All</option>
+                        <option value="80">80</option>
+                        <option value="81">81</option>
+                        <option value="82">82</option>
+                        <option value="83">83</option>
+                        <option value="84">84</option>
+                        <option value="85">85</option>
+                        <option value="86">86</option>
+                        <option value="87">87</option>
+                        <option value="88">88</option>
+                        <option value="89">89</option>
+                        <option value="91">91</option>
+                        <option value="92">92</option>
+                        <option value="93">93</option>
+                        <option value="94">94</option>
+                        <option value="95">95</option>
+                        <option value="96">96</option>
+                        <option value="97">97</option>
+                        <option value="98">98</option>
+                        <option value="99">99</option>
+                        <option value="100">100</option>
+                    </lightning:select>-->
+                  
+                  	
+                    
+                    <!--Quantity-->
+                    <h2 class="header">Quantity: input the desired quantity in Kg</h2>
+                    <lightning:input type="number" aura:id="quantity" label="Leave it blank for no filter" placeholder="Input the desired quantity and then a unit" min="0"/>
+                  	<br/>  
+                  	<div class="slds-border_bottom"></div>
+                    
+                    <br/>
+                  
+                  	<!--Unit of Measure
+                  	<h2 class="header">Unit of measure</h2>
+                  	<lightning:select aura:id="unit" label="Select a unit">
+                        <option value="Kg">Kg</option>
+                        <option value="Gr">Gr</option>
+                    </lightning:select>
+                    <br/>  
+                    <div class="slds-border_bottom"></div>
+                  
+                  	<br/>-->
+                    
+                    <!--State Controller Field-->
+                    <lightning:select name="controllerFld"
+                                      value="{!v.objDetail.State__c}"
+                                      label="State"
+                                      onchange="{!c.onControllerFieldChange}"
+                                      aura:id="state">
+                        <aura:iteration items="{!v.listControllingValues}" var="val">
+                            <option value="{!val}">{!val}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    
+                    <!--Province Dependent Field-->
+                    <lightning:select name="dependentFld"
+                                      value="{!v.objDetail.Province__c}"
+                                      label="City"
+                                      disabled="{!v.bDisabledDependentFld}"
+                                      aura:id="province"
+                                      >
+                        <aura:iteration items="{!v.listDependingValues}" var="val">
+                            <option value="{!val}">{!val}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                  	<br/>  
+                  	<div class="slds-border_bottom"></div>
+                  	
+                  	<br/>
+                  	
+                  	<center>
+                		<button class="slds-button slds-button_brand" onclick="{!c.filterProducts}">
+                            Apply filters
+                            &nbsp; &nbsp; 
+                            <i class="fas fa-arrow-circle-right white"></i>
+                        </button>
+                    </center>
+                  
+              </div>
+          </div>
+        	
+          <!--Second column for products-->	
+          <div class="slds-col slds-size_9-of-12 products-column">
+            <span></span>
+              <div class="slds-box">
+                  
+                  <!--first layout for aply filter button and search bar-->
+                  <lightning:layout verticalAlign="center" class="layout-aux">
+                      <lightning:layoutItem size="4">
+                          <button class="slds-button slds-button_brand second-filter-button" onclick="{!c.filterProducts}">
+                              Apply filters
+                              &nbsp; &nbsp; 
+                              <i class="fas fa-arrow-circle-right white"></i>
+                          </button>
+                      </lightning:layoutItem>
+                      
+                      <lightning:layoutItem  flexibility="grow" size="7">
+                          <lightning:input type="text" aura:id="searchBar" placeholder="Input some keyboards to search"/>
+                      </lightning:layoutItem>
+                      
+                      <lightning:layoutItem  flexibility="no-grow" size="1">
+                          <button class="slds-button slds-button_brand button-search" onclick="{!c.searchKeyWords}">
+                              <i class="fas fa-search white"></i>
+                          </button>
+                      </lightning:layoutItem>
+                  </lightning:layout> 
+                  
+                  <!--Second layout to show loading icon if it takes too long-->
+                  <lightning:layout verticalAlign="center" horizontalAlign="center">
+                      <aura:if isTrue="{!v.isLoading}">
+                          <lightning:layoutItem  flexibility="grow"> <!-- class="slds-is-relative" -->
+                              <center><i class="fas fa-spinner fa-spin fa-3x blue icon-loading-custom"></i></center>
+                          </lightning:layoutItem>
+                      </aura:if>
+                  </lightning:layout>
+                  
+                  <br/>
+                  
+                  <!--third layout showing products-->
+                  <lightning:layout multipleRows="true" horizontalAlign="center">
+                      
+                      <aura:if isTrue="{!v.noItemsToDisplay}">
+                          <br/>
+                          <br/>
+                          <br/>
+                          <br/>
+                        <div class="slds-text-heading_large slds-text-align_center">Sorry, there's no items to display at the moment. Please try again with another filters or keywords</div>
+                      </aura:if>
+                      
+                      <!--Starts ifLoading-->
+                      <aura:if isTrue="{!v.isLoading}">
+                      <aura:set attribute="else">
+                          
+                        
+                      <!--iteration of products-->
+                      <aura:iteration items="{!v.productList}" var="product">
+                          <!--a single product-->
+                          <lightning:layoutItem  flexibility="no-grow"  class="product"   padding="around-small">
+                              <article class="slds-card">
+                                  <div class="slds-card__header slds-grid">
+                                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                      <div class="slds-media__figure">
+                                        <span class="slds-icon_container slds-icon-standard-account" title="account">
+                                          <span class="slds-assistive-text">account</span>
+                                        </span>
+                                      </div>
+                                      <div class="slds-media__body">
+                                        <h2 class="slds-card__header-title">
+                                            <div class="slds-text-align_left product-title"><ui:outputText value="{!product.Name}"/></div>  
+                                        </h2>
+                                      </div>
+                                      <div class="slds-no-flex">
+                                        
+                                        <div class="slds-text-align_right product-title price">$ <ui:outputText value="{!product.Price__c}"/></div>
+                                      </div>
+                                    </header>
+                                  </div>
+                                  <div class="slds-border_bottom"></div>
+                                  
+                                  
+                                  <div class="slds-card__body slds-card__body_inner">
+                                    <img src="{!$Resource.TestProductImage}" alt="test image"></img>
+                                    <br/>
+                                    <br/>
+                                    <div class="slds-text-align_left">Type: <ui:outputText value="{!product.Type__c}"/></div>  
+                                    <div class="slds-text-align_left">Manufacturer: <ui:outputText value="{!product.Manufacturer_Name__c}"/></div>
+                                    <div class="slds-text-align_left">Net weight: <ui:outputNumber value="{!product.Quantity__c}"/> Kg</div>
+                                    <div class="slds-text-align_left">Variety: <ui:outputText value="{!product.Variety__c}"/></div>
+                                    <div class="slds-text-align_left">Score: <ui:outputText value="{!product.Quality__c}"/></div>
+                                      <div class="slds-text-align_left">Price: $<ui:outputText value="{!product.Price__c}"/></div>  
+                                    <div class="slds-text-align_left">From: <ui:outputText value="{!product.Province__c}"/>, <ui:outputText value="{!product.State__c}"/>, Colombia</div>
+                                  </div>
+                                  
+                                  <div class="slds-border_bottom"></div>
+                                  <footer class="slds-card__footer">
+                                    <button class="slds-button slds-button_neutral show-details-button" onclick="{!c.pickUpProduct}" id="{!product.Id}"><i class="fas fa-search-plus"></i></button>
+                                    &nbsp;
+                                    <button class="slds-button slds-button_brand" onclick="{!c.addProduct}" id="{!product.Id}" >
+                                        Add to interests 
+                                        &nbsp;&nbsp; 
+                                        <!--<aura:if isTrue="{!v.showMiniLoading}">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                        <aura:set attribute="else">
+                                            <i class="fas fa-mug-hot"></i>
+                                        </aura:set>
+                                        </aura:if>-->
+                                        
+                                        <i class="fas fa-mug-hot"></i>
+                                   	</button>
+                                    
+                                  </footer>
+                                </article>
+                          </lightning:layoutItem>
+                      </aura:iteration>
+                         
+                      <!--Ends else ifLoading-->      
+                      </aura:set>
+                      </aura:if> 
+                      
+                  </lightning:layout>
+              </div>
+          </div>
+    </div>
+    
+    <!--Modal box for showing details of product-->
+    <aura:if isTrue="{!v.openModalBox}">
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+          <div class="slds-modal__container">
+            <header class="slds-modal__header">
+              <button class="slds-button slds-button_icon slds-modal__close" title="Close" onclick="{!c.closeModalWindow}">
+                <i class="far fa-times-circle fa-2x"></i>
+                <span class="slds-assistive-text">Close</span>
+              </button>
+                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate"><b>Details of product &nbsp; <i class="fas fa-list-ul"></i></b></h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+              	
+                <div class="slds-box">
+                    <div class="slds-p-horizontal_large slds-p-horizontal_large">
+                        <div class=" slds-text-align_left wine"><b><i class="fas fa-info-circle"></i> &nbsp;&nbsp; Product information:</b></div>
+                        <br/>
+                    </div>
+                <div class="slds-grid slds-gutters slds-p-horizontal_large">
+                  	
+                      <div class="slds-col slds-size_6-of-12">
+                        <div class=" slds-text-align_left"><b>Type:</b> &nbsp; {!v.productPicked[0].Type__c}</div>  
+                        <div class=" slds-text-align_left"><b>Manufacturer: &nbsp; {!v.productPicked[0].Manufacturer_Name__c}</b> Cafe Granja la Esperanza</div>
+                        <div class=" slds-text-align_left"><b>Net weight:</b> &nbsp; {!v.productPicked[0].Manufacturer_Quantity__c}</div>
+                      	<div class=" slds-text-align_left"><b>Variety:</b> &nbsp; {!v.productPicked[0].Variety__c}</div>
+                        <div class=" slds-text-align_left"><b>Score:</b> &nbsp; {!v.productPicked[0].Quality__c}</div>
+                        <div class=" slds-text-align_left"><b>Price:</b> &nbsp; {!v.productPicked[0].Price__c}</div>
+                        <div class=" slds-text-align_left"><b>From:</b> &nbsp; {!v.productPicked[0].Province__c}, {!v.productPicked[0].State__c}, Colombia</div>
+                        
+                      </div>
+                    	
+                    
+                      <div class="slds-col slds-size_6-of-12">
+                     	
+                        <div class=" slds-text-align_left"><b>Characteristics:</b> Strong, Juicy, Acid, Cream</div>
+                        <div class=" slds-text-align_left"><b>Further description:</b> 
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                        consequat.</div>  
+                        
+                      </div>
+                   </div>
+                
+                
+                <div class="slds-grid slds-gutters ">
+                  <div class="slds-col slds-size_12-of-12">
+                      	<br/>
+                      	<div class="slds-p-horizontal_large">
+                    	<div class=" slds-text-align_left wine"><b><i class="far fa-images"></i> &nbsp;&nbsp; Product Images:</b></div>
+                        </div>
+                        
+                        <c:SlickSliderv2></c:SlickSliderv2>
+                                  
+                    </div>
+                  </div>
+                    
+                  <!--<div class="slds-grid slds-gutters ">
+                  <div class="slds-col slds-size_12-of-12">
+                      	<br/>
+                      	<div class="slds-p-horizontal_large">
+                    	<div class=" slds-text-align_left wine"><b><i class="fas fa-map-marked-alt"></i> &nbsp;&nbsp; Product manufacture location:</b></div>
+                        </div>
+                        
+                        <c:ProductLocationMap></c:ProductLocationMap>
+                                  
+                    </div>
+                  </div>-->  
+                    
+                </div>
+                
+                
+            </div>
+            <footer class="slds-modal__footer">
+                
+              	<button class="slds-button slds-button_neutral" onclick="{!c.closeModalWindow}">Close</button>
+                &nbsp;
+                <button class="slds-button slds-button_brand" onclick="{!c.addProduct}" id="{!v.productPicked[0].Id}">Add to interests &nbsp;&nbsp; <i class="fas fa-mug-hot"></i></button>
+                
+            </footer>
+          </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+    <!--alert sucess-->
+    <aura:if isTrue="{!v.showAlertSuc}">
+    <div class="demo-only" style="height:24rem">
+        <section role="alertdialog" tabindex="0" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal_prompt" aria-modal="true">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header slds-theme_success">
+                    <div class="slds-text-body_regular"><aura:unescapedHtml value="{!v.alertMessage}"/></div>
+                </header>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_outline-brand" onclick="{!c.closeAlertSuc}">Okay</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    </aura:if>
+    
+    <!--alert warning-->
+    <aura:if isTrue="{!v.showAlertWar}">
+    <div class="demo-only" style="height:24rem">
+        <section role="alertdialog" tabindex="0" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal_prompt" aria-modal="true">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header slds-theme_alert-texture slds-theme_info">
+                    <div class="slds-text-body_regular"><aura:unescapedHtml value="{!v.alertMessage}"/></div>
+                </header>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_outline-brand" onclick="{!c.closeAlertWar}">Okay</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    </aura:if>
+    
+</aura:component>

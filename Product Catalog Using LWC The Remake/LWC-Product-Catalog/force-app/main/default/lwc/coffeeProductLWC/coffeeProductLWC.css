@@ -1,0 +1,148 @@
+ .controls-column,  .products-column{
+    padding:15px !important;
+}
+
+ .sticky{
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0 !important;
+}
+
+ .product{
+    /*border-width:1px;
+    border-style:solid;*/
+    box-shadow: 5px 5px 6px #888888;
+    margin: 9px !important;
+    width: 22vw !important;
+    padding: 0px !important;
+    width: 20vw !important;
+}
+
+.slds-card{
+    box-shadow: 5px 5px 6px #888888 !important;
+    margin: 9px !important;
+    width: 22vw !important;
+    padding: 0px !important;
+    width: 20vw !important;
+}
+
+.product-image{
+    height: 29vh !important;
+}
+
+
+ .product-text{
+    padding : 3px !important;
+}
+
+ .slds-button_brand{
+    background-color: #8f1d14 !important;
+    border-color: #8f1d14 !important;
+}
+
+
+ .slds-button_neutral{
+    background-color: #5d3a3a !important;
+    border-color: #5d3a3a !important;
+    color:white !important;
+}
+
+ /*.show-details-button{
+    padding-top:8px !important;
+    padding-bottom:7px !important;
+}*/
+
+
+ .product-title{
+    color: #8f4426 !important;
+    border-color: #8f4426 !important;
+
+}
+
+ .jumbotron{
+    margin-bottom: 10px;
+    padding : 40px;
+    color: white !important;
+}
+
+ .jumbotron-text-container{
+    /*margin: 35px 0px 35px 0px;*/
+    margin: 4vh 0vh 0vh 0vh;
+}
+
+ .jumbotron-title{
+    font-size: 50px !important;
+}
+
+ .jumbotron-subtitle{
+    margin-top:7px;
+    font-size: 17px !important;
+    
+}
+
+ .layout-aux{
+    padding-left:14px;
+    padding-right:12px;
+}
+
+ .second-filter-button{
+    margin-top: 20px;
+}
+
+ .button-search{
+    /*margin-top: 18px;*/
+    padding-top:8px !important;
+    padding-bottom:7px !important;
+}
+
+.button-added{
+    background-color: #5f6769 !important;
+    border-color: #5f6769 !important;
+}
+
+ .white{
+    color:white !important;
+}
+
+ .black{
+    color:black !important;
+}
+
+ .blue{
+    color: #3e64ff !important;
+}
+
+ .icon-loading-custom{
+    margin-top : 15vh;
+    margin-bottom : 15vh;
+}
+
+ .far.fa-times-circle{
+    color:#8f1d14;
+}
+
+ .with-border{
+    border-width:1px;
+    border-style:solid;
+}
+
+ .price{
+    font-size:22px;
+    margin-top:8px;
+    margin-left:8px;
+    color:#8f1d14 !important;
+}
+
+ .box-full-width{
+    width: 100% !important;
+    height:100% !important;
+}
+
+ .wine{
+    color: #8f1d14 !important;
+}
+
+ .alert-body{
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+}

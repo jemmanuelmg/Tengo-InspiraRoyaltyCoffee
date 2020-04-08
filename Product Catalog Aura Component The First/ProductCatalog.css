@@ -1,0 +1,130 @@
+.THIS .controls-column, .THIS .products-column{
+    padding:15px !important;
+}
+
+.THIS .sticky{
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0 !important;
+}
+
+.THIS .product{
+    /*border-width:1px;
+    border-style:solid;*/
+    box-shadow: 5px 5px 6px #888888;
+    margin: 9px;
+    width: 22vw;
+    padding: 0px !important
+}
+
+
+.THIS .product-text{
+    padding : 3px !important;
+}
+
+.THIS .slds-button_brand{
+    background-color: #8f1d14 !important;
+    border-color: #8f1d14 !important;
+}
+
+
+.THIS .slds-button_neutral{
+    background-color: #5d3a3a !important;
+    border-color: #5d3a3a !important;
+    color:white !important;
+}
+
+.THIS .show-details-button{
+    padding-top:8px !important;
+    padding-bottom:7px !important;
+}
+
+
+.THIS .product-title{
+    color: #8f4426 !important;
+    border-color: #8f4426 !important;
+
+}
+
+.THIS .jumbotron{
+    margin-bottom: 10px;
+    padding : 40px;
+    color: white !important;
+}
+
+.THIS .jumbotron-text-container{
+    /*margin: 35px 0px 35px 0px;*/
+    margin: 4vh 0vh 0vh 0vh;
+}
+
+.THIS .jumbotron-title{
+    font-size: 50px !important;
+}
+
+.THIS .jumbotron-subtitle{
+    margin-top:7px;
+    font-size: 17px !important;
+    
+}
+
+.THIS .layout-aux{
+    padding-left:14px;
+    padding-right:12px;
+}
+
+.THIS .second-filter-button{
+    margin-top: 20px;
+}
+
+.THIS .button-search{
+    margin-top: 18px;
+    padding-top:8px !important;
+    padding-bottom:7px !important;
+}
+
+.THIS .white{
+    color:white !important;
+}
+
+.THIS .black{
+    color:black !important;
+}
+
+.THIS .blue{
+    color: #3e64ff !important;
+}
+
+.THIS .icon-loading-custom{
+    margin-top : 15vh;
+    margin-bottom : 15vh;
+}
+
+.THIS .far.fa-times-circle{
+    color:#8f1d14;
+}
+
+.THIS .with-border{
+    border-width:1px;
+    border-style:solid;
+}
+
+.THIS .price{
+    font-size:22px;
+    margin-top:8px;
+    margin-left:8px;
+    color:#8f1d14 !important;
+}
+
+.THIS .box-full-width{
+    width: 100% !important;
+    height:100% !important;
+}
+
+.THIS .wine{
+    color: #8f1d14 !important;
+}
+
+.THIS .alert-body{
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+}

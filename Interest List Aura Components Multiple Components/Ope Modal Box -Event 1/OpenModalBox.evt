@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Open the confirmation modal box in the main ShoppingCart Aura Component" >
+    <aura:attribute name="openModalBoxAtt" Type="Boolean"/>
+</aura:event>

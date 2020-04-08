@@ -1,0 +1,111 @@
+public class ShoppingCartController {
+    
+	@AuraEnabled
+    public static List<Product3__c> getAddedToCartItems(){
+        List<Product3__c> myList;
+        List<Id> productIds;
+        
+        try{
+            productIds  = (List<Id>) Cache.Session.get('local.Inspira.productIds');
+            myList = [SELECT Name, Price__c FROM Product3__c WHERE Id IN :productIds];
+        }catch(Exception e){
+            myList = new List<Product3__c>(); //send an empty list if something bad happens
+        }    
+        
+        return myList;
+        
+        
+    }
+    
+    
+    @AuraEnabled
+    public static List<Product3__c> removeProductFromCart(Id productId){
+       
+    	List<Id> productIds  = (List<Id>) Cache.Session.get('local.Inspira.productIds');
+        
+        for (Integer i = (productIds.size()-1) ; i>= 0 ; i--){
+            Id curId = productIds[i];
+            if(curId == productId){
+                productIds.remove(i);
+            }
+        } 
+        
+        Cache.Session.put('local.Inspira.productIds', productIds);
+
+    	
+        List<Product3__c> productsAdded = [SELECT 
+                                              Name,
+                                           	  Price__c
+                                          FROM Product3__c
+                                          WHERE Id in :productIds];
+        
+        //return all, the information of the products added to cart 
+        return productsAdded;
+        
+   	}
+    
+    
+    @AuraEnabled
+    public static Decimal getTotalPriceCart(){
+        
+        List<Id> productIds  = (List<Id>) Cache.Session.get('local.Inspira.productIds');
+        AggregateResult[] value = [SELECT 
+                            SUM(Price__c)price
+                            FROM Product3__c
+                            WHERE Id IN :productIds];
+        
+        Decimal subtotal = (Decimal) value[0].get('price');
+        return subtotal;
+    }
+    
+    @AuraEnabled
+    public static List<Product3__c> registerProductRequest(Boolean pricing, Boolean hunting, Boolean label, Boolean exportv, String description ){
+       
+        //recover list of current product ids added to cart
+        List<Id> productIds  = (List<Id>) Cache.Session.get('local.Inspira.productIds');
+        
+        //create a Buyer request to link all the new records to
+        Buyer_Request__c mainBuyerReq = new Buyer_Request__c();
+        
+        insert mainBuyerReq;
+        
+        mainBuyerReq.Pricing_Details__c = pricing;
+        mainBuyerReq.Coffee_Hunting__c = hunting;
+        mainBuyerReq.Private_Label__c = label;
+        mainBuyerReq.Export_Services__c = exportv;
+        mainBuyerReq.Description__c = description;
+        
+        //create a list to store all the objects that will be inserted at once
+        List<Product_Request__c> prodReqList = new List<Product_Request__c>();
+        
+        //loop over list and create objects to insert later 
+        Decimal sumTotalPrice = 0.0;
+       
+        List<Product3__c> auxList = new List<Product3__c>();
+        for (Id curId : productIds) {
+            Product_Request__c prodReq = new Product_Request__c(Product_Inspira__c = curId, Buyer_Request__c = mainBuyerReq.Id);
+            prodReqList.add(prodReq);
+            
+            auxList = [SELECT Price__c FROM Product3__c WHERE Id =: curId];
+            sumTotalPrice += auxList[0].Price__c * 1;
+        }
+        
+        //finally, insert all the new products of the request at once
+        insert prodReqList;
+        
+        //Add it to the object and update it insmediatly
+        mainBuyerReq.Total_Price__c = sumTotalPrice;
+        update mainBuyerReq;
+
+        //clear session list of Ids
+        productIds = new List<Id>();
+        Cache.Session.put('local.Inspira.productIds', productIds);
+        
+        //return an empty list to show nothing in the component
+        List<Product3__c> emptyList = new List<Product3__c>();
+        return emptyList;
+        
+    	}
+    
+    
+	}

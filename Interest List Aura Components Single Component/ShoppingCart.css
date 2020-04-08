@@ -1,0 +1,56 @@
+.THIS .with-border{
+    border-width:1px;
+    border-style:solid;
+}
+
+
+.THIS .jumbotron{
+    margin-bottom: 10px;
+    padding : 8px;
+    color: white !important;
+}
+
+.THIS .jumbotron-text-container{
+    margin-top: 15px 
+}
+
+.THIS .jumbotron-title{
+    font-size: 40px !important;
+}
+
+.THIS .jumbotron-subtitle{
+    /*margin-top:7px;*/
+    /*font-size: 17px !important;*/
+    
+}
+
+.THIS .shopping-cart-image{
+    height : 35vh;
+}
+
+.THIS .price-column{
+    margin-left:8px;
+    border-bottom:0px;
+}
+
+.THIS .pleaseAddShadow{
+    /*box-shadow: 2px 4px 3px #888888 !important;*/
+}
+
+.THIS .all-height{
+    height: 35vh !important;
+}
+
+.THIS .wine{
+    color:#8f1d14 !important;
+}
+
+.THIS .arial{
+    font-family:arial !important;
+}
+
+.THIS .sticky{
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0 !important;
+}

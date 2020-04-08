@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Open the alert success dialog box and displays a message" >
+    <aura:attribute name="openAlertSucAtt" Type="Boolean"/>
+    <aura:attribute name="msgAlertSucAtt" Type="String"/>
+</aura:event>

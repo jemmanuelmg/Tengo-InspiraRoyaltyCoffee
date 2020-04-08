@@ -1,0 +1,239 @@
+<aura:component controller="ShoppingCartController" implements="forceCommunity:availableForAllPageTypes" access="global" >
+	
+    <!-- Aura handlers-->   
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!-- Aura attributes-->   
+    <aura:attribute name="backgroundImageURL" type="String" default=""/>
+    <aura:attribute name="backgroundColor" type="String" default="white"/>
+    <aura:attribute name="addedToCart" type="List" />
+    <aura:attribute name="showAlertSuc" type="boolean" default="false"/>
+    <aura:attribute name="showAlertWar" type="boolean" default="false"/>
+    <aura:attribute name="alertMessage" type="String" default=""/>
+    <aura:attribute name="noItemsToDisplay" type="Boolean" default="false"/>
+    <aura:attribute name="actualCartValue" type="Decimal" default="0.0"/>
+	<aura:attribute name="countOfProducts" type="Decimal" default="0"/>
+    <aura:attribute name="openModalBox" type="boolean" default="false"/>
+    
+    <!--Always visible part of the component-->
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_10-of-12 ">
+            
+            <!--first grid for jumbotron-->
+            <div class="slds-grid slds-gutters slds-p-horizontal_medium">
+              <div class="slds-col slds-size_1-of-1">
+                <center>
+                    
+                    <div class="jumbotron" style="{!'position: relative; height: 25vh; background:' + v.backgroundColor  + ' url(' + v.backgroundImageURL +') no-repeat;background-position: center;background-size: cover;'}"> 
+                        <div class="jumbotron-text-container">
+                            <div class="slds-text-heading_large jumbotron-title">Interests List</div>
+                            <br/>
+                            <div class="slds-text-align_center jumbotron-subtitle">Review the products you've added to your list, remove or change quantity if you want, and when you feel ready, submit this request to Inspira.</div>
+                        </div>
+                    </div>
+                    
+                </center>
+              </div>
+            </div>
+            
+            <aura:if isTrue="{!v.noItemsToDisplay}">
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-1">
+                        <br/>
+                        <br/>
+                        <center>
+                        <div class="slds-text-heading_medium slds-text-align_left slds-p-horizontal_large">You don't have any product in your cart currently. Add some products from the product catalog and see here the details</div>
+                        </center>
+                        <br/>
+                        <br/>
+                    </div>
+                </div>
+            </aura:if>
+            
+            
+            <!--Second grid for products-->
+            <div class="slds-grid slds-gutters slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border_bottom">
+                <div class="slds-col slds-size_1-of-1">
+                    
+                    <aura:iteration items="{!v.addedToCart}" var="productCart">
+                    <div class="slds-grid slds-gutters">
+                        
+                        <div class="slds-col slds-size_3-of-12 ">
+                            <img src="{!$Resource.TestProductImage}" alt="product image" class="shopping-cart-image"></img>
+                        </div>
+                        
+                        <div class="slds-col slds-size_9-of-12">
+                            <div class="pleaseAddShadow">
+                            <article class="slds-card all-height">
+                              <div class="slds-card__body slds-card__body_inner ">
+                                  
+                                  <div class="slds-grid slds-gutters ">
+                                      <div class="slds-col slds-size_8-of-12">
+                                        <div class="slds-text-heading_medium">{!productCart.Name}</div>
+                                      </div>
+                                      <div class="slds-col slds-size_4-of-12">    
+                                        <div class="slds-text-heading_medium slds-text-align_right wine"><b><i>US<i class="arial">$ &nbsp;</i></i>{!productCart.Price__c}</b></div>
+                                      </div> 
+                                  </div>    
+                                  
+                                  <br/>
+                                  <br/>
+                                  
+                                  <div class="slds-grid slds-gutters ">
+                                      <div class="slds-col slds-size_3-of-12 slds-border_right">
+                                          <lightning:input type="number" aura:id="{!productCart.Id}" label="Quantity of this item to request" placeholder="Modify quantity" min="0"/>
+                                      </div>
+                                      <div class="slds-col slds-size_3-of-12 slds-border_right ">
+                                          <center>
+                                          <button class="slds-button slds-button_brand slds-m-top_large" id="{!productCart.Id}" onclick="{!c.updateProductQuantity}">Update this item</button>
+                                          </center>    
+                                      </div>
+                                      <div class="slds-col slds-size_4-of-12">
+                                          <center>
+                                          <button class="slds-button slds-button_neutral slds-m-top_large" onclick="{!c.removeProduct}" id="{!productCart.Id}">Remove item from cart</button>
+                                          </center>    
+                                      </div>
+                                      <div class="slds-col slds-size_2-of-12">
+                                          
+                                      </div>
+                                  </div>
+                                  
+                              </div>
+                            </article>
+                            </div>   
+                        </div>
+                        
+                    </div>
+                    <br/>    
+                    </aura:iteration>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <!--Summary of this request-->
+        <div class="slds-col slds-size_2-of-12">
+            <div class="pleaseAddShadow slds-m-horizontal_small slds-m-vertical_small sticky">
+                <article class="slds-card all-height">
+                    <div class="slds-card__body slds-card__body_inner ">
+                        <div class="slds-text-heading_medium slds-text-align_left">{!v.countOfProducts} products added</div>
+                        <br/>
+                        <div class="slds-text-heading_medium slds-text-align_left">Total price:</div> 
+                        
+                        <div class="slds-text-heading_medium slds-text-align_left wine"><b><i>US<i class="arial">$ &nbsp;</i></i>{!v.actualCartValue}</b></div>
+                        
+                        <br/>
+                        
+                        <aura:if isTrue="{!v.noItemsToDisplay}">
+                            <aura:set attribute="else">
+                                <center>
+                                	<button class="slds-button slds-button_brand" onclick="{!c.openModalWindow}">Submit request</button>
+                                </center>
+                            </aura:set>
+                        </aura:if>
+                        
+                        
+                    </div>
+                </article>
+            </div>   
+        </div>
+    </div>
+    
+    <br/>
+    <br/>
+    <br/>
+    
+    <!--alert sucess-->
+    <aura:if isTrue="{!v.showAlertSuc}">
+        <div class="demo-only" style="height:24rem">
+            <section role="alertdialog" tabindex="0" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal_prompt" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header slds-theme_success">
+                        <div class="slds-text-body_regular"><aura:unescapedHtml value="{!v.alertMessage}"/></div>
+                    </header>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_outline-brand" onclick="{!c.closeAlertSuc}">Okay</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    <!--alert warning-->
+    <aura:if isTrue="{!v.showAlertWar}">
+        <div class="demo-only" style="height:24rem">
+            <section role="alertdialog" tabindex="0" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal_prompt" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header slds-theme_alert-texture slds-theme_info">
+                        <div class="slds-text-body_regular"><aura:unescapedHtml value="{!v.alertMessage}"/></div>
+                    </header>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_outline-brand" onclick="{!c.closeAlertWar}">Okay</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    <!--Modal box for showing details of product-->
+    <aura:if isTrue="{!v.openModalBox}">
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+          <div class="slds-modal__container">
+            <header class="slds-modal__header ">
+              <button class="slds-button slds-button_icon slds-modal__close" title="Close" onclick="{!c.closeModalWindow}">
+                <i class="far fa-times-circle fa-2x"></i>
+                <span class="slds-assistive-text">Close</span>
+              </button>
+                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate"><b>Confirmation</b></h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                
+              	<div class="slds-text-heading_medium slds-text-align_left slds-p-horizontal_large slds-p-vertical_medium">
+                    Tell Inspira a bit more about your request.
+                </div>             
+                <div class="slds-text-align_left slds-p-horizontal_large slds-p-vertical_medium">
+                    I want to know more about...
+                </div>
+                <div class="slds-grid slds-gutters slds-p-horizontal_large slds-align_absolute-center">
+                    <div class="slds-col">
+                        <ui:inputCheckbox aura:id="checkboxPricing" value="true"/> Pricing details
+                        <br/>
+                        <ui:inputCheckbox aura:id="checkboxHunting" value="false"/> Coffee hunting services
+                    </div>
+                    
+                    <div class="slds-col">
+                        <ui:inputCheckbox aura:id="checkboxLabel" value="false"/> Private Label Coffee
+                    	<br/>
+                        <ui:inputCheckbox aura:id="checkboxExport" value="false"/> Export Services
+                    </div>
+                </div>
+                <br/>
+                <div class="slds-text-align_left slds-p-horizontal_large slds-p-vertical_medium">
+                    Tell more details to our team.
+                    <br/>
+                    <ui:inputTextArea aura:id="txtDescription" rows="3" cols="80" placeholder="say more"/>
+                </div>
+                
+            </div>
+            <footer class="slds-modal__footer">
+                
+              	<button class="slds-button slds-button_neutral" onclick="{!c.closeModalWindow}">Cancel</button>
+                &nbsp;
+                <button class="slds-button slds-button_brand" onclick="{!c.submitRequest}">Send request</button>
+                
+            </footer>
+          </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+    
+    
+    <!--test zone-->
+     
+        
+    
+</aura:component>

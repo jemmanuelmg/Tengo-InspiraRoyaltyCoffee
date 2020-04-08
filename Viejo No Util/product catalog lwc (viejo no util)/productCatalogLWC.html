@@ -1,0 +1,129 @@
+<!--
+  @File Name          : productCatalogLWC.html
+  @Description        : 
+  @Author             : emmanuel.martinez@tengo.co
+  @Group              : 
+  @Last Modified By   : emmanuel.martinez@tengo.co
+  @Last Modified On   : 04/12/2019, 11:51:16
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    29/11/2019   emmanuel.martinez@tengo.co     Initial Version
+-->
+<template>
+
+    <div class="slds-grid slds-gutters">
+
+        <div class="slds-col slds-size_3-of-12">
+            <div class="slds-box">
+            
+            <div class="slds-text-heading_medium slds-text-align_center"><b>Filter of product &nbsp;&nbsp; <!-- <i class="fas fa-filter black"></i> --></b></div>
+            <br/>    
+
+            <!--Type of coffee selector-->
+            <lightning-combobox class="cmp-in-type" label="Type of coffee" options={typeOptions}></lightning-combobox>
+
+            <br />
+
+            <!--Variety of coffee selector-->
+            <lightning-combobox class="cmp-in-variety" label="Variety of coffee" options={varietyOptions}>
+            </lightning-combobox>
+
+            <br />
+
+            <!--Quality-->
+            <lightning-combobox class="cmp-in-quality" label="Score of coffee" options={qualityOptions}>
+            </lightning-combobox>
+            <br>
+
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-2">
+                    <!--Quantity-->
+                    <lightning-input class="cmp-in-quantity" type="number" label="Net Weight" min="0" placeholder="Weight"></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <!--Unit of Measure-->
+                    <lightning-combobox class="cmp-in-unitOfMeasure" label="Unit of Measure" options={unitsOptions}></lightning-combobox>
+                </div>
+            </div>
+            <br>
+            
+            <!--State Controller Field-->
+            <lightning-combobox label="Product State" class="cmp-in-state" onchange={handleCountryChange}
+                options={controllingValues} placeholder="--None--" value={selectedCountry}></lightning-combobox><br />
+
+            <!--Province Dependent Field-->
+            <lightning-combobox label="Product Province" class="cmp-in-province" onchange={handleStateChange}
+                options={dependentValues} placeholder="--None--" value={selectedState} disabled={isEmpty}>
+            </lightning-combobox><br />
+
+            <!--Characteristics-->
+            <lightning-dual-listbox class="cmp-in-charsList" label="Select Options" source-label="Characteristics" disable-reordering="true"
+                selected-label="Selected" options={characteristics}>
+            </lightning-dual-listbox>
+
+            <br>
+            <center>
+                <button class="slds-button slds-button_brand" onclick={filterProducts}>
+                    Apply filters
+                    &nbsp; &nbsp;
+                    <!-- <i class="fas fa-arrow-circle-right white"></i> -->
+                </button>
+            </center>
+            </div>
+
+        </div>
+
+        <div class="slds-col slds-size_9-of-12">
+
+            <div class="slds-box">
+            <lightning-layout vertical-align="center" class="layout-aux">
+                <lightning-layout-item size="4">
+                    <button class="slds-button slds-button_brand second-filter-button">
+                        Apply filters
+                        &nbsp; &nbsp; 
+                        <!-- <i class="fas fa-arrow-circle-right white"></i> -->
+                    </button>
+                </lightning-layout-item>
+                
+                <lightning-layout-item  flexibility="grow" size="7">
+                    <lightning-input type="text" placeholder="Input some keyboards to search" class="cmp-in-keywords"></lightning-input>
+                </lightning-layout-item>
+                
+                <lightning-layout-item  flexibility="no-grow" size="1">
+                    <button class="slds-button slds-button_brand button-search" onclick={searchKeyWords}>
+                        Search<!-- <i class="fas fa-search white"></i> -->
+                    </button>
+                </lightning-layout-item>
+            </lightning-layout> 
+            <br>
+
+            
+                <div class="c-container">
+                    <lightning-layout multiple-rows="true" horizontal-align="center">
+                        <template for:each={productList} for:item="product">
+                            <c-coffee-product-l-w-c 
+                                onopenmodal={handleOpenModal}
+                                key={product.Id} 
+                                product-id={product.Id} 
+                                name={product.Name}
+                                type={product.Type__c} 
+                                variety={product.Variety__c} 
+                                quality={product.Quality__c}
+                                quantity={product.Quantity__c} 
+                                unit-of-measure={product.Unit_Of_Measure__c}
+                                price={product.Price__c}
+                                product={product}>
+                            </c-coffee-product-l-w-c>
+                        </template>
+                    </lightning-layout>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <template if:true={openModal}>
+        <c-coffee-product-detail-l-w-c detail-product={detailProduct} onclosemodal={handleCloseModal}></c-coffee-product-detail-l-w-c> 
+    </template>
+
+</template>
